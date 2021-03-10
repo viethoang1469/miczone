@@ -3,7 +3,7 @@ $(document).ready(function () {
     let btnDone = "<span class='statusBtn done'>done</span>";
     let btnUndone = "<span class='statusBtn undone'>undone</span>";
     $.ajax({
-        url: 'http://localhost:8084/api/list.php?action=toDoList',
+        url: 'http://localhost:8082/api/list.php?action=toDoList',
         method: 'get',
         dataType: 'json',
         success: function (result) {
@@ -20,7 +20,7 @@ $(document).ready(function () {
         e.preventDefault();
         let frm = $("#form");
         $.ajax({
-            url: 'http://localhost:8084/api/list.php?action=add',
+            url: 'http://localhost:8082/api/list.php?action=add',
             method: 'post',
             dataType: 'json',
             data: frm.serialize(),
@@ -38,7 +38,7 @@ $(document).ready(function () {
         let id = $(this).parent().data('id');
         let old_status = ($(this).text() === 'undone') ? 'done' : 'not_done_yet';
         let element = $(this);
-        $.get('http://localhost:8084/api/list.php?action=edit&id=' + id + '&old_status=' + old_status, function( result ) {
+        $.get('http://localhost:8082/api/list.php?action=edit&id=' + id + '&old_status=' + old_status, function( result ) {
             if(result.success === true){
                 flag = true;
                 changeStatus(element);
@@ -51,7 +51,7 @@ $(document).ready(function () {
     $('#list').on("click", '.deleteBtn', function () {
         let id = $(this).parent().data('id');
         let flag = false;
-        $.get('http://localhost:8084/api/list.php?action=delete&id=' + id, function( result ) {
+        $.get('http://localhost:8082/api/list.php?action=delete&id=' + id, function( result ) {
             if(result.success === true){
                 $('[data-id="' + id + '"]').css('display', 'none');
                 flag = true;

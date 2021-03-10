@@ -1,12 +1,43 @@
 <?php
 include 'model.php';
+$model = new model();
+$result = $model->GetAllData();
+echo '<pre>';
+print_r($result);
+echo '</pre>';
+
+
+
+
+session_start();
+$arrListFirst = [
+    [
+        'id'     => 1,
+        'name'   => 'id 1',
+        'status' => 'done',
+    ],
+    [
+        'id'     => 2,
+        'name'   => 'id 22',
+        'status' => 'not_done_yet',
+    ],
+    [
+        'id'     => 3,
+        'name'   => 'id 3',
+        'status' => 'done',
+    ],
+];
+if(!isset($_SESSION['arrList']))
+{
+    $_SESSION['arrList'] = $arrListFirst;
+}
+$arrList = $_SESSION['arrList'];
 
 
 $action = $_REQUEST['action'];
-$action($_REQUEST);
-function toDoList( $params) {
-  $model = new model();
-  $arrList = $model->GetAllData();
+$action($_SESSION['arrList'], $_REQUEST);
+function toDoList($arrList, $params) {
+    
     try {
         $arrResponse = [
         'code'    => 200,
@@ -41,9 +72,8 @@ function toDoList( $params) {
     
     
 }
-function add( $params)
+function add(&$arrList, $params)
 {
-  $model = new model();
     try{
         if($params['name'] === '')
         {
@@ -58,12 +88,13 @@ function add( $params)
             exit();
         }
         $txtName = $params['name'];
-        $intId = $model->insert($txtName, 'not_done_yet');
+        $intId = end($arrList)['id'] + 1;
         $arrNode = [
             'id'      => $intId,
             'name'    => $txtName,
             'status'  => 'not_done_yet',
         ];
+        array_push($arrList, $arrNode);
         $arrResponse = [
             'code'    => 201,
             'success' => true,
@@ -86,10 +117,9 @@ function add( $params)
     header('Content-Type: application/json');
     echo json_encode($arrResponse);
 }
-function edit( $params) // params: id , old_status
+function edit(&$arrList, $params) // params: id , old_status
 {
     try{
-      $model = new model();
         $flag = false;
         if(!isset($params['id']))
         {
@@ -105,16 +135,24 @@ function edit( $params) // params: id , old_status
             echo json_encode($arrResponse);
             exit();
         }
-        $status = ($params['old_status'] === 'done') ? 'not_done_yet' : 'done';
-        $flag = $model->edit($params['id'], $status);
+        foreach($arrList as $key => $val)
+        {
+            if($val['id'] === (int)$params['id'])
+            {
+                $arrList[$key]['status'] = ($params['old_status'] === 'done') ? 'not_done_yet' : 'done';
+                $arrNode = $arrList[$key];
+                $flag = true;
+                break;
+            }
+        }
         if($flag === false)
         {
             $arrResponse = [
                 'code'    => 404,
                 'success' => false,
-                'message' => 'khong sua duoc',
+                'message' => 'khong tim thay item',
                 'error' => [
-                    'loi' => 'khong sua duoc',
+                    'loi' => 'khong tim thay item',
                 ],
             ];
             header('Content-Type: application/json');
@@ -127,6 +165,7 @@ function edit( $params) // params: id , old_status
                 'success' => true,
                 'message' => 'cap nhat du lieu thanh cong',
                 'error' => null,
+                'data'    => $arrNode,
             ];
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
@@ -146,9 +185,8 @@ function edit( $params) // params: id , old_status
     }
     
 }
-function delete($params){
+function delete(&$arrList, $params){
     try{
-        $model = new model();
         $flag = false;
         if(!isset($params['id']))
         {
@@ -164,15 +202,24 @@ function delete($params){
             echo json_encode($arrResponse);
             exit();
         }
-        $intId = $model->delete($params['id']);
-        if($intId === false)
+        foreach($arrList as $key => $val)
+        {
+            if($val['id'] === (int)$params['id'])
+            {
+                $arrNode = $arrList[$key];
+                unset($arrList[$key]);
+                $flag = true;
+                break;
+            }
+        }
+        if($flag === false)
         {
             $arrResponse = [
                 'code'    => 404,
                 'success' => false,
-                'message' => 'khong xoa duoc',
+                'message' => 'khong tim thay item can xoa',
                 'error' => [
-                    'loi' => 'khong xoa duoc',
+                    'loi' => 'khong tim thay item',
                 ],
             ];
             header('Content-Type: application/json');
@@ -185,6 +232,7 @@ function delete($params){
                 'success' => true,
                 'message' => 'xoa du lieu thanh cong',
                 'error' => null,
+                'data'    => $arrNode,
             ];
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
