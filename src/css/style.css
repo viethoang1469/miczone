@@ -1,0 +1,123 @@
+* {
+    box-sizing: border-box;
+  }
+.banner img {
+    width: 100%;
+}
+.menu ul {
+    list-style: none;
+    display: flex;
+    background-color: rgba(11, 61, 10, 0.864);
+}
+.menu ul li {
+    margin: 10px;
+    padding: 10px;
+}
+.menu ul li:hover{
+    background-color: burlywood;
+}
+.menu ul li a {
+    text-decoration: none;
+    color: black;
+}
+.container {
+    display: grid;
+    grid-gap: 5px;
+    grid-template-columns: repeat(auto-fit, minmax(470px, 1fr));
+    /* grid-template-rows: repeat(2,100px); */
+}
+#list{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#list li{
+  position: relative;
+  padding: 12px 8px 12px 40px;
+  background: #eee;
+  font-size: 18px;
+  transition: 0.2s;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#list li:nth-child(odd) {
+    background: #f9f9f9;
+  }
+#list li:hover {
+    background: #ddd;
+  }
+  /* Style the header */
+.header {
+    background-color: #193b0e;
+    padding: 30px 40px;
+    color: white;
+    text-align: center;
+  }
+  /* Clear floats after the header */
+.header:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  input {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    width: 75%;
+    padding: 10px;
+    float: left;
+    font-size: 16px;
+  }
+  .addBtn {
+    padding: 10px;
+    width: 25%;
+    background: #d9d9d9;
+    color: #555;
+    float: left;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 0;
+  }
+  .statusBtn {
+    background-color: rgb(29, 84, 172);
+    text-align: center;
+    width: 10%;
+    float: right;
+    display: block;
+    cursor: pointer;
+    color: wheat;
+  }
+  .deleteBtn {
+    background-color: red;
+    text-align: center;
+    width: 10%;
+    float: right;
+    display: block;
+    cursor: pointer;
+    margin-left: 10px;
+    color: wheat;
+  }
+  .list-left{
+      list-style: none;
+  }
+  .title {
+      background-color:#193b0e;
+      color: white;
+      text-align: center;
+  }
+  footer {
+    background-image: linear-gradient(#193b0e, #238c44);
+    padding: 10px;
+    color: wheat;
+  }
+  .article a {
+      text-decoration: none;
+  }
+  .title h2{
+    margin: 0px !important;
+  }
