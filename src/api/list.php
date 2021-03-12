@@ -1,5 +1,7 @@
 <?php
+
 include 'model.php';
+include 'response.php';
 
 
 $action = $_REQUEST['action'];
@@ -17,37 +19,23 @@ function toDoList($redis, $params) {
         $model = new model();
         $arrList = $model->GetAllData();
         $redis->set('list', json_encode($arrList));
-        $redis->expire('list', 259200); // 3 days
+        $redis->expire('list', 86400); // 1 ngay
     }
+    $response = new response();
     try {
-        $arrResponse = [
-        'code'    => 200,
-        'success' => true,
-        'data'    => $arrList,
-        'error'   => null,
-        'message' => 'lay du lieu thanh cong',
-        ];
+        
+        $response->set(200, true, $arrList, null, 'lay du lieu thanh cong');
+        
         if(!isset($arrList))
         {
-            $arrResponse = [
-                'code'    => 404,
-                'success' => false,
-                'error'   => null,
-                'error' => null,
-                'message' => 'lay du lieu ko thanh cong',
-            ];
+            $response->set(404, false, null, null, 'lay du lieu khong thanh cong');
         }
         
+        
     } catch (Exception $e) {
-        $arrResponse = [
-            'code'    => 404,
-            'success' => false,
-            'error' => [
-                'loi' => 'loi',
-            ],
-            'message' => $e->getMessage(),
-        ];
+        $response->set(404, false, null, ['loi' => 'loi'], $e->getMessage());
     }
+    $arrResponse = $response->getResponse();
     header('Content-Type: application/json');
     echo json_encode($arrResponse);
     
@@ -55,16 +43,13 @@ function toDoList($redis, $params) {
 }
 function add($redis, $params)
 {
-  $model = new model();
+    $response = new response();
     try{
+        $model = new model();
         if($params['name'] === '')
         {
-            $arrResponse = [
-                'code'    => 400,
-                'success' => false,
-                'message' => 'rong',
-                'error'   => null,
-            ];
+            $response->set(400, false, null, null, 'rong');
+            $arrResponse = $response->getResponse();
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
             exit();
@@ -77,43 +62,26 @@ function add($redis, $params)
             'name'    => $txtName,
             'status'  => 'not_done_yet',
         ];
-        $arrResponse = [
-            'code'    => 201,
-            'success' => true,
-            'message' => 'them du lieu thanh cong',
-            'error'   => null,
-            'data'    => $arrNode,
-        ];
+        $response->set(201, true, $arrNode, null, 'them du lieu thanh cong');
+        
     }catch (Exception $e) {
-        $arrResponse = [
-            'code'    => 404,
-            'success' => false,
-            'error' => [
-                'loi' => 'loi',
-            ],
-            'message' => $e->getMessage(),
-        ];
+        $response->set(404, false, null, ['loi' => 'loi'], $e->getMessage());
     }
     
-    
+    $arrResponse = $response->getResponse();
     header('Content-Type: application/json');
     echo json_encode($arrResponse);
 }
 function edit($redis, $params) // params: id , old_status
 {
+    $response = new response();
     try{
-      $model = new model();
+        $model = new model();
         $flag = false;
         if(!isset($params['id']))
         {
-            $arrResponse = [
-                'code'    => 404,
-                'success' => false,
-                'message' => 'khong tim thay item',
-                'error' => [
-                    'loi' => 'khong tim thay item',
-                ],
-            ];
+            $response->set(404, false, null, ['loi' => 'khong tim thay item'], 'khong tim thay item');
+            $arrResponse = $response->getResponse();
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
             exit();
@@ -122,58 +90,37 @@ function edit($redis, $params) // params: id , old_status
         $flag = $model->edit($params['id'], $status);
         if($flag === false)
         {
-            $arrResponse = [
-                'code'    => 404,
-                'success' => false,
-                'message' => 'khong sua duoc',
-                'error' => [
-                    'loi' => 'khong sua duoc',
-                ],
-            ];
+            $response->set(404, false, null, ['loi' => 'khong sua duoc'], 'khong sua duoc');
+            $arrResponse = $response->getResponse();
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
             exit();
         }
-        else {
-            $redis->delete('list');
-            $arrResponse = [
-                'code'    => 204,
-                'success' => true,
-                'message' => 'cap nhat du lieu thanh cong',
-                'error' => null,
-            ];
-            header('Content-Type: application/json');
-            echo json_encode($arrResponse);
-            exit();
-        }
+        
+        $redis->delete('list');
+        $response->set(204, true, null, null, 'cap nhat du lieu thanh cong');
+        $arrResponse = $response->getResponse();
+        header('Content-Type: application/json');
+        echo json_encode($arrResponse);
+        exit();
+        
     }catch (Exception $e) {
-        $arrResponse = [
-            'code'    => 404,
-            'success' => false,
-            'error' => [
-                'loi' => 'loi',
-            ],
-            'message' => $e->getMessage(),
-        ];
+        $response->set(404, false, null, ['loi' => 'loi'], $e->getMessage());
+        $arrResponse = $response->getResponse();
         header('Content-Type: application/json');
         echo json_encode($arrResponse);
     }
     
 }
 function delete($redis, $params){
+    $response = new response();
     try{
         $model = new model();
         $flag = false;
         if(!isset($params['id']))
         {
-            $arrResponse = [
-                'code'    => 404,
-                'success' => false,
-                'message' => 'khong tim thay item can xoa',
-                'error' => [
-                    'loi' => 'khong tim thay item',
-                ],
-            ];
+            $response->set(404, false, null, ['loi' => 'khong tim thay item'], 'khong tim thay item can xoa');
+            $arrResponse = $response->getResponse();
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
             exit();
@@ -181,39 +128,24 @@ function delete($redis, $params){
         $intId = $model->delete($params['id']);
         if($intId === false)
         {
-            $arrResponse = [
-                'code'    => 404,
-                'success' => false,
-                'message' => 'khong xoa duoc',
-                'error' => [
-                    'loi' => 'khong xoa duoc',
-                ],
-            ];
+            $response->set(404, false, null, ['loi' => 'khong xoa duoc'], 'khong xoa duoc');
+            $arrResponse = $response->getResponse();
             header('Content-Type: application/json');
             echo json_encode($arrResponse);
             exit();
         }
         
-        $arrResponse = [
-            'code'    => 204,
-            'success' => true,
-            'message' => 'xoa du lieu thanh cong',
-            'error' => null,
-        ];
+        $response->set(204, true, null, null, 'xoa du lieu thanh cong');
+        $arrResponse = $response->getResponse();
         $redis->delete('list');
         header('Content-Type: application/json');
         echo json_encode($arrResponse);
         exit();
         
     }catch (Exception $e) {
-        $arrResponse = [
-            'code'    => 404,
-            'success' => false,
-            'error' => [
-                'loi' => 'loi',
-            ],
-            'message' => $e->getMessage(),
-        ];
+        
+        $response->set(404, false, null, ['loi' => 'loi'],$e->getMessage());
+        $arrResponse = $response->getResponse();
         header('Content-Type: application/json');
         echo json_encode($arrResponse);
     }
