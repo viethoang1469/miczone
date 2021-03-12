@@ -3,10 +3,22 @@ include 'model.php';
 
 
 $action = $_REQUEST['action'];
-$action($_REQUEST);
-function toDoList( $params) {
-  $model = new model();
-  $arrList = $model->GetAllData();
+
+$redis = new Redis();
+$redis->connect('redis', 6379);
+$action($redis, $_REQUEST);
+function toDoList($redis, $params) {
+    if($redis->exists('list'))
+    {
+        
+        $arrList = json_decode($redis->get('list'));
+    }
+    else{
+        $model = new model();
+        $arrList = $model->GetAllData();
+        $redis->set('list', json_encode($arrList));
+        $redis->expire('list', 259200); // 3 days
+    }
     try {
         $arrResponse = [
         'code'    => 200,
@@ -41,7 +53,7 @@ function toDoList( $params) {
     
     
 }
-function add( $params)
+function add($redis, $params)
 {
   $model = new model();
     try{
@@ -59,6 +71,7 @@ function add( $params)
         }
         $txtName = $params['name'];
         $intId = $model->insert($txtName, 'not_done_yet');
+        $redis->delete('list');
         $arrNode = [
             'id'      => $intId,
             'name'    => $txtName,
@@ -86,7 +99,7 @@ function add( $params)
     header('Content-Type: application/json');
     echo json_encode($arrResponse);
 }
-function edit( $params) // params: id , old_status
+function edit($redis, $params) // params: id , old_status
 {
     try{
       $model = new model();
@@ -122,6 +135,7 @@ function edit( $params) // params: id , old_status
             exit();
         }
         else {
+            $redis->delete('list');
             $arrResponse = [
                 'code'    => 204,
                 'success' => true,
@@ -146,7 +160,7 @@ function edit( $params) // params: id , old_status
     }
     
 }
-function delete($params){
+function delete($redis, $params){
     try{
         $model = new model();
         $flag = false;
@@ -179,17 +193,18 @@ function delete($params){
             echo json_encode($arrResponse);
             exit();
         }
-        else {
-            $arrResponse = [
-                'code'    => 204,
-                'success' => true,
-                'message' => 'xoa du lieu thanh cong',
-                'error' => null,
-            ];
-            header('Content-Type: application/json');
-            echo json_encode($arrResponse);
-            exit();
-        }
+        
+        $arrResponse = [
+            'code'    => 204,
+            'success' => true,
+            'message' => 'xoa du lieu thanh cong',
+            'error' => null,
+        ];
+        $redis->delete('list');
+        header('Content-Type: application/json');
+        echo json_encode($arrResponse);
+        exit();
+        
     }catch (Exception $e) {
         $arrResponse = [
             'code'    => 404,
