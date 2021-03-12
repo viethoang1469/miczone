@@ -17,7 +17,7 @@ function toDoList($redis, $params) {
         $model = new model();
         $arrList = $model->GetAllData();
         $redis->set('list', json_encode($arrList));
-        $redis->expire('list', 259200); // 3 days
+        $redis->expire('list', 86400); // 1 ngay
     }
     try {
         $arrResponse = [
