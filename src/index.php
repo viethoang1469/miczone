@@ -29,29 +29,18 @@
         <div>
             <div class="">
                 <div class="title">
-                    <h2>To do list</h2>
+                    <h2>Email</h2>
                     <hr>    
                 </div>
-                <ul id="" class="list-left">
-                    <li><a href="#">All</a></li>
-                    <li><a href="#">Done</a></li>
-                    <li><a href="#">Undone</a></li>
-                </ul>
+                <form action="queue/email.php" id="email" method="post"> 
+                    <input type="text" name="email" placeholder="Email...">
+                    <input type="text" name="title" placeholder="Title...">
+                    <input type="text" name="conent" placeholder="Content...">
+                    <button type="submit"  >Submit</button>
+                </form>
                 
             </div>
-            <div class="article">
-                <div class="title">
-                    <h2>News</h2>
-                    <hr>   
-                    
-                </div>
-                <ul id="" class="list-left">
-                    <li><a href="#">New article 1</a></li>
-                    <li><a href="#">New article 2</a></li>
-                    <li><a href="#">New article 3</a></li>
-                    <li><a href="#">New article 4</a></li>
-                </ul>
-            </div>
+            
         </div>
         <div>
             <div id="myDIV" class="header">
@@ -64,7 +53,9 @@
             <ul id="list">
             </ul>
         </div>
+        
     </div>
+    
     <footer>
         <p>Author: Viet Hoang<br>
         <a href="mailto:viethoang1541@gmail.com">viethoang1541@gmail.com</a></p>

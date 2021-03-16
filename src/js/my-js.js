@@ -28,7 +28,7 @@ $(document).ready(function () {
                 let element = '<li data-id = '+ result.data.id + '>' + result.data.name + btnDelete + btnDone + '</li>';
                 $('#list').prepend(element);
                 $('#myInput').val('');
-                alert(result.message);
+                // alert(result.message);
             }
         });
 
@@ -42,7 +42,7 @@ $(document).ready(function () {
             if(result.success === true){
                 flag = true;
                 changeStatus(element);
-                alert(result.message);
+                // alert(result.message);
             }
         });
         
@@ -55,7 +55,7 @@ $(document).ready(function () {
             if(result.success === true){
                 $('[data-id="' + id + '"]').css('display', 'none');
                 flag = true;
-                alert(result.message);
+                // alert(result.message);
             }
         });
     });
